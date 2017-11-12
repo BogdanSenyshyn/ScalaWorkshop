@@ -1,6 +1,8 @@
 package model
 import slick.jdbc.PostgresProfile.api._
 
+import scala.concurrent.Future
+
 case class Staff (id: Option[Long], name: String, rate: Double, age: Int)
 
 class StaffTable(tag: Tag) extends Table[Staff](tag, "staff") {
@@ -11,4 +13,12 @@ class StaffTable(tag: Tag) extends Table[Staff](tag, "staff") {
 
   def * = (id.?, name, rate, age) <> (Staff.apply _ tupled, Staff.unapply) //this is better than an example, tupled - 2 paramet
   // ers - 1 parameter for previous tuple
+}
+
+object StaffTable {
+  val table = TableQuery[StaffTable]
+}
+
+class CountryRepository(db: Database) {
+  def create(staff: Staff): Future[Staff] = db.run(StaffTable.table returning StaffTable.table += staff)
 }
