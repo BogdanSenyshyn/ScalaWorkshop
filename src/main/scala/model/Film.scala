@@ -1,7 +1,7 @@
 package model
 
 import slick.jdbc.PostgresProfile.api._
-
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
 
@@ -77,5 +77,18 @@ object FilmToCountryTable {
 }
 
 class FilmRepository(db: Database) {
-  def create(film: Film): Future[Film] = db.run(FilmTable.table returning FilmTable.table += film)
+  def create(film: Film, genreIds: List[Long], actorIds: List[Long],
+             countryIds: List[Long]): Future[Film] = {
+    val query =
+      (FilmTable.table returning FilmTable.table += film).flatMap{film =>
+        (FilmToGenreTable.table ++= genreIds.map(genreId => FilmToGenre(None, film.id.get, genreId))).andThen(
+          (FilmToCountryTable.table ++= countryIds.map(countryId => FilmToCountry(None, film.id.get, countryId))).andThen(
+            FilmToCastTable.table ++= actorIds.map(actorId => FilmToCast(None, film.id.get, actorId))
+          )
+        ).andThen(DBIO.successful(film))
+      }
+    db.run(query)
+  }
 }
+
+

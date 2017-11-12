@@ -1,12 +1,19 @@
 import model._
 import slick.jdbc.PostgresProfile.api._
 import scala.concurrent.Await
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration._
 
-object Main extends App{
+object Main{
   val db = Database.forConfig("db")
 
   val countryRepository = new CountryRepository(db)
+  val genreRepository = new GenreRepository(db)
+  val staffRepository = new StaffRepository(db)
+  val filmRepository = new FilmRepository(db)
+
+  def main(args: Array[String]): Unit ={
+     databaseFill()
+  }
 
   def init(): Unit = {
     Await.result(db.run(CountryTable.table.schema.create), Duration.Inf)
@@ -18,9 +25,13 @@ object Main extends App{
     Await.result(db.run(FilmToCountryTable.table.schema.create), Duration.Inf)
   }
 
-//  def databaseFill(): Unit = {
-//    for(i <- 1 to 5) {
-//      countryRepository.create(Country[Some(i), s"Counrty #$1"])
+  def databaseFill(): Unit = {
+//    for(i <- 1 to 10) {
+//      Await.result(staffRepository.create(Staff(Some(i), s"Staff #$i", i % 5  + 1, 20 + i)), Duration.Inf)
 //    }
-//  }
+//
+//    for(i <- 1 to 5) {
+//      Await.result(filmRepository.create(Film(Some(i), s"Genre #$i", (i * 10).seconds, i % 5 +1, i % 5)), Duration.Inf)
+//    }
+  }
 }

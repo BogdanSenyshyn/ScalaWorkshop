@@ -19,6 +19,6 @@ object StaffTable {
   val table = TableQuery[StaffTable]
 }
 
-class CountryRepository(db: Database) {
+class StaffRepository(db: Database) {
   def create(staff: Staff): Future[Staff] = db.run(StaffTable.table returning StaffTable.table += staff)
 }
