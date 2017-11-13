@@ -90,14 +90,30 @@ class FilmRepository(db: Database) {
     db.run(query)
   }
 
-//  def getById(filmId: Long): Future[Option[(Film, List[Genre], List[Country], )]] = {
-//    val query = for (
-//      film <- FilmTable.table.filter(_.id === filmId).result.head
-//      genres <- GenreTable.table.filter(_.id in (
-//      FilmToGenreTable.table.filter(_.filmId === filmId).map(_.genreId)
-//    ).result
-//    ) yield (film, genres, countries, actors)
-//  }
+  def getById(filmId: Long): Future[(Film, Seq[Genre], Seq[Country], Seq[Staff])] = {
+    val query = for {
+      film <- FilmTable.table.filter(_.id === filmId).result.head
+      genres <- GenreTable.table.filter(_.id in (
+        FilmToGenreTable.table.filter(_.filmId === filmId).map(_.genreId))
+      ).result
+      countries <- CountryTable.table.filter(_.id in (
+        FilmToCountryTable.table.filter(_.filmId === filmId).map(_.countryId))
+      ).result
+      actors <- StaffTable.table.filter(_.id in (
+        FilmToCastTable.table.filter(_.filmId === filmId).map(_.staffId))
+      ).result
+    } yield (film, genres, countries, actors)
+
+    db.run(query)
+  }
+
+  def getFilmWithDirector(filmId: Long): Future[(Film, Staff)] = {
+    val query = FilmTable.table join StaffTable.table on (_.directorId === _.id)
+    db.run(
+      query.result.head
+    )
+  }
 }
+
 
 
