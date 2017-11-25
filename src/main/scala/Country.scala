@@ -1,5 +1,7 @@
-package model
+import model._
+import implicits._
 import slick.jdbc.PostgresProfile.api._
+
 import scala.concurrent.Future
 
 case class Country (id: Option[Long], title: String)//option because of autoinc
