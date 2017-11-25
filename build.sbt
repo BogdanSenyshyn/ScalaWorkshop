@@ -1,11 +1,11 @@
 val globalSettings = Seq[SettingsDefinition](
   version := "0.1",
-
   scalaVersion := "2.12.4",
 )
 
 val model = Project("model", file("model"))
     .settings(globalSettings: _*)
+
 
 val repositories = Project("repositories", file("repositories"))
     .dependsOn(model)
@@ -21,7 +21,8 @@ val repositories = Project("repositories", file("repositories"))
     )
 
 val application = Project("application", file("application"))
-  .settings(globalSettings: _*).dependsOn(repositories)
+  .dependsOn(repositories)
+  .settings(globalSettings: _*)
 
 val root = Project(id = "ScalaWorkshop", base = file("."))
   .aggregate(application)
